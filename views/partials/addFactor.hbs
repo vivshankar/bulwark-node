@@ -1,0 +1,133 @@
+<!-- 
+  Copyright IBM Corp. 2016, 2018
+
+  This source code is licensed under the Apache-2.0 license found in the
+  LICENSE file in the root directory of this source tree.
+-->
+
+<button class="bx--btn bx--btn--primary" type="button" data-modal-target="#modal-enroll">Add</button>
+
+<div data-modal id="modal-enroll" class="bx--modal " role="dialog"
+  aria-modal="true" aria-labelledby="modal-enroll-label" aria-describedby="modal-enroll-heading" tabindex="-1">
+  <div class="bx--modal-container">
+    <div class="bx--modal-header">
+      <p class="bx--modal-header__label bx--type-delta" id="modal-enroll-label"></p>
+      <p class="bx--modal-header__heading bx--type-beta" id="modal-enroll-heading">Enroll for Text Message</p>
+      <button class="bx--modal-close" type="button" data-modal-close aria-label="close modal" >
+        <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;" xmlns="http://www.w3.org/2000/svg" class="bx--modal-close__icon" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M12 4.7L11.3 4 8 7.3 4.7 4 4 4.7 7.3 8 4 11.3 4.7 12 8 8.7 11.3 12 12 11.3 8.7 8z"></path></svg>
+      </button>
+    </div>
+
+    <!-- Note: Modals with content that scrolls, at any viewport, requires `tabindex="0"` on the `bx--modal-content` element -->
+
+    <div class="bx--modal-content bx--modal-content--with-form" >
+      <div class="bx--form-item">
+        <label for="text-input-enroll" class="bx--label" id="label-input-enroll">Phone number</label>
+        <input id="text-input-enroll" type="text" class="bx--text-input" placeholder=""
+          data-modal-primary-focus>
+      </div>
+    </div>
+    <div class="bx--modal-content--overflow-indicator"></div>
+
+    <div class="bx--modal-footer">
+      <button id="button-close" class="bx--btn bx--btn--secondary" type="button" data-modal-close>Close</button>
+      <button id="button-next" class="bx--btn bx--btn--primary" type="button"  >Next</button>
+    </div>
+  </div>
+  <!-- Note: focusable span allows for focus wrap feature within Modals -->
+  <span tabindex="0"></span>
+</div>
+
+<script type="text/javascript">
+
+var factorModalState = {
+  mode: 0,
+  current: null
+};
+
+document.getElementById('button-close').addEventListener('click', function(event) {
+  factorModalState = {
+    mode: 0,
+    current: null
+  };
+  document.getElementById('label-input-enroll').innerText = 'Phone number';
+  return true;
+});
+
+document.getElementById('button-next').addEventListener('click', function(event) {
+    event.preventDefault();
+    if (factorModalState.mode == 0) {
+        enrollSMS();
+    } else if (factorModalState.mode == 1) {
+        verifySMS();
+    } else {
+        location.reload();
+    }
+}, false);
+
+enrollSMS = () => {
+  const data = { phoneNumber: document.getElementById('text-input-enroll').value };
+
+  fetch('/factors/smsotp/enroll', {
+      method: 'POST', // or 'PUT'
+      headers: {
+          'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+  })
+  .then(response => response.json())
+  .then(data => {
+      console.log('Success:', data);
+      factorModalState.current = data;
+      doAuth();
+  })
+  .catch((error) => {
+      console.error('Error:', error);
+  });
+}
+
+doAuth = () => {
+  const data = { factorId: factorModalState.current.id, correlation: '1357' };
+
+  fetch('/factors/smsotp/auth', {
+      method: 'POST', // or 'PUT'
+      headers: {
+          'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+  })
+  .then(response => response.json())
+  .then(data => {
+      console.log('Success:', data);
+      factorModalState.mode = 1;
+      factorModalState.factorId = factorModalState.current.id;
+      factorModalState.current = data;
+      document.getElementById('label-input-enroll').innerText = 'Enter OTP';
+      document.getElementById('text-input-enroll').value = '';
+  })
+  .catch((error) => {
+      console.error('Error:', error);
+  });
+}
+
+verifySMS = () => {
+    const data = { factorId: factorModalState.factorId, trxId: factorModalState.current.id, otp: document.getElementById('text-input-enroll').value };
+
+    fetch('/factors/smsotp/verify', {
+        method: 'POST', // or 'PUT'
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Success:', data);
+        location.reload();
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+}
+
+</script>

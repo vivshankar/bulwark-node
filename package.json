@@ -1,0 +1,22 @@
+{
+  "name": "bulwark-node",
+  "version": "0.0.1",
+  "description": "Sample project to illustrate Factors enrollment in IBM Security Verify",
+  "scripts": {
+    "dev": "nodemon server/server.js",
+    "start": "node server/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Vivek Shankar",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-handlebars": "^5.1.0",
+    "express-session": "^1.17.1",
+    "ibm-verify-sdk": "^2.0.2"
+  }
+}
