@@ -9,7 +9,6 @@ module.exports = class FactorsClient {
 
     async getFactors(token) {
 
-        console.log("[DEBUG] token = " +token);
         let config = {
             method: 'get',
             url: this.tenant + '/v2.0/factors',
@@ -18,8 +17,6 @@ module.exports = class FactorsClient {
                 'Accept': 'application/json'
             }
         };
-
-        console.log("[DEBUG] tenant URL = " + this.tenant);
 
         let factors = {
             smsotp: [],
@@ -85,7 +82,6 @@ module.exports = class FactorsClient {
             return null;
         }
 
-        console.log("[DEBUG] Normalized factors = " + JSON.stringify(factors));
         return factors;
     }
     

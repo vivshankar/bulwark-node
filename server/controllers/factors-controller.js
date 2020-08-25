@@ -4,7 +4,6 @@ const oauthController = require('./oauth-controller');
 
 exports.getEnrollments = (req, res) => {
     
-    console.log("[DEBUG] tenant = " + config.tenantUrl);
     let factorsClient = new FactorsClient(config.tenantUrl);
 
     let token = oauthController.getAuthToken(req, res);
@@ -45,12 +44,11 @@ exports.getEnrollments = (req, res) => {
 
 exports.getEnrollmentsView = (req, res) => {
 
-    console.log("[DEBUG] tenant = " + config.tenantUrl);
     let factorsClient = new FactorsClient(config.tenantUrl);
 
     let token = oauthController.getAuthToken(req, res);
     if (token == null) {
-        req.session.targetUrl = '/factors';
+        req.session.targetUrl = req.originalUrl;
         res.redirect('/login');
         return;
     }

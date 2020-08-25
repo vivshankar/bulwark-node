@@ -22,7 +22,6 @@ module.exports = class SMSOTPClient {
         try {
 
             let res = await axios(config);
-            console.log("[DEBUG] [smsotp::enroll] Response " + JSON.stringify(res.data));
             result.data = res.data;
         }
         catch (error) {
@@ -51,7 +50,6 @@ module.exports = class SMSOTPClient {
         try {
 
             let res = await axios(config);
-            console.log("[DEBUG] [smsotp::initiateAuth] Response " + JSON.stringify(res.data));
             result.data = res.data;
         }
         catch (error) {
@@ -80,11 +78,35 @@ module.exports = class SMSOTPClient {
         try {
 
             let res = await axios(config);
-            console.log("[DEBUG] [smsotp::verify] Response " + JSON.stringify(res.data));
             result.data = res.data;
         }
         catch (error) {
             console.error("[smsotp::verify] " + error);
+            result.error = {
+                status: error.response.status,
+                body: error.response.data
+            }
+        }
+
+        return result;
+    }
+
+    async delete(token, factorId) {
+
+        let config = {
+            method: 'delete',
+            url: this.tenant + '/v2.0/factors/smsotp/' + factorId,
+            headers: { 'Authorization': 'Bearer ' + token }
+        };
+
+        let result = { success: true };
+        try {
+
+            let res = await axios(config);
+        }
+        catch (error) {
+            console.error("[smsotp::enroll] " + error);
+            result.success = false;
             result.error = {
                 status: error.response.status,
                 body: error.response.data

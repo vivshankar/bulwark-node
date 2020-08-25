@@ -9,6 +9,7 @@ exports.enroll = (req, res) => {
     let token = oauthController.getAuthToken(req, res);
     if (token == null) {
         res.status(401);
+        res.end();
         return;
     }
 
@@ -38,6 +39,7 @@ exports.initiateAuth = (req, res) => {
     let token = oauthController.getAuthToken(req, res);
     if (token == null) {
         res.status(401);
+        res.end();
         return;
     }
 
@@ -67,6 +69,7 @@ exports.verify = (req, res) => {
     let token = oauthController.getAuthToken(req, res);
     if (token == null) {
         res.status(401);
+        res.end();
         return;
     }
 
@@ -85,6 +88,38 @@ exports.verify = (req, res) => {
         })
         .catch((error) => {
             console.error("[smsotp-controller::verify] error = " + error);
+            res.status(500);
+        });
+}
+
+exports.delete = (req, res) => {
+    
+    let client = new SMSClient(config.tenantUrl);
+
+    let token = oauthController.getAuthToken(req, res);
+    if (token == null) {
+        res.status(401);
+        res.end();
+        return;
+    }
+
+    client.delete(token, req.params.factorId)
+        .then((result) => {
+            if (result.error != null) {
+                res.status(result.error.status);
+                if (result.error.body != null) {
+                    res.json(result.error.body);
+                }
+
+                return;
+            }
+
+            res.status(204);
+            res.end();
+            return;
+        })
+        .catch((error) => {
+            console.error("[smsotp-controller::delete] error = " + error);
             res.status(500);
         });
 }

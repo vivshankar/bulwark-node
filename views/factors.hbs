@@ -19,6 +19,7 @@
             <span class="bx--tag__label">Enabled</span>
         </button>
         {{/if}}
+        <a href="#" tabindex="0" class="bx--link bx--link--inline" onclick="(() => { deleteSMS('{{id}}'); })()">Delete</a>
       </div>
     </li>
     {{/each}}
@@ -51,3 +52,15 @@
 <div>
   {{> addFactor }}
 </div>
+
+<script type="text/javascript">
+  deleteSMS = (factorId) => {
+    fetch('/factors/smsotp/' + factorId, {
+        method: 'DELETE'
+    })
+    .then((response) => location.reload())
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+  }
+</script>
